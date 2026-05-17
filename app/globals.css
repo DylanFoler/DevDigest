@@ -1,306 +1,224 @@
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Authentic Windows 95 palette ───────────── */
-
 :root {
-  /* Desktop & surfaces */
-  --bg:       #008080;   /* classic Win95 teal desktop */
-  --win-bg:   #c0c0c0;   /* silver window face */
-  --win-dark: #808080;   /* shadow edge */
-  --win-lo:   #404040;   /* dark shadow edge */
-  --win-hi:   #ffffff;   /* highlight edge */
-  --win-mid:  #c0c0c0;   /* button face */
+  --bg:      #0a0a0f;
+  --panel:   #0e0e16;
+  --panel-hi: #141420;
+  --panel-lo: #090910;
 
-  /* Title bar (active) */
-  --title-from: #000080;
-  --title-to:   #1084d0;
+  --accent:  #e8edf2;   /* near-white — labels, headers, active */
+  --accent2: #c8d0da;   /* slightly dimmer for hover */
 
-  /* Text */
-  --tp:  #000000;
-  --tm:  #444444;
-  --td:  #808080;
+  --tp:  #f0f4f8;       /* primary — near white */
+  --tm:  #b8c4d0;       /* muted — visible light gray */
+  --td:  #6a7a8a;       /* dim — placeholders */
 
-  /* Status */
-  --merged: #008000;
-  --failed: #800000;
-  --stale:  #7a4800;
+  --merged: #3daa80;
+  --failed: #c05060;
+  --stale:  #b89040;
 
-  /* Backward-compat aliases used by inline styles */
-  --b1:        #808080;
-  --b2:        #404040;
-  --s1:        rgba(0, 0, 0, 0.04);
-  --s2:        rgba(0, 0, 0, 0.07);
-  --s3:        rgba(0, 0, 0, 0.11);
-  --border:    #808080;
-  --border-hi: #404040;
-  --glass:     #c0c0c0;
-  --glass-hi:  #d4d0c8;
-  --glass-lo:  #a8a8a8;
-  --radius:    0px;
-  --radius-sm: 0px;
-
-  /* Neon aliases remapped to Win95 blues */
-  --neon-pink:   #000080;
-  --neon-cyan:   #000080;
-  --neon-purple: #1084d0;
-  --neon-mint:   #008000;
-  --neon-yellow: #7a4800;
+  /* backward-compat */
+  --b1:        rgba(255,255,255,0.07);
+  --b2:        rgba(255,255,255,0.14);
+  --s1:        rgba(255,255,255,0.02);
+  --s2:        rgba(255,255,255,0.04);
+  --s3:        rgba(255,255,255,0.06);
+  --border:    rgba(255,255,255,0.07);
+  --border-hi: rgba(255,255,255,0.16);
+  --glass:     #0e0e16;
+  --glass-hi:  #141420;
+  --glass-lo:  #090910;
+  --radius:    2px;
+  --radius-sm: 2px;
+  --neon-pink:   #e8edf2;
+  --neon-cyan:   #e8edf2;
+  --neon-purple: #e8edf2;
+  --neon-mint:   #3daa80;
+  --neon-yellow: #b89040;
+  --win-hi:  rgba(255,255,255,0.14);
+  --win-lo:  rgba(255,255,255,0.06);
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
   background: var(--bg);
   color: var(--tp);
-  font-family: 'VT323', 'MS Sans Serif', 'Courier New', monospace;
-  font-size: 14px;
-  line-height: 1.4;
-  -webkit-font-smoothing: none;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ── Win95 panel / window ────────────────────── */
+/* ── Panel ─────────────────────────────────── */
 
 .glass-panel {
-  background: var(--win-bg);
-  border: 2px solid;
-  border-color: var(--win-hi) var(--win-lo) var(--win-lo) var(--win-hi);
-  box-shadow:
-    inset -1px -1px 0 var(--win-dark),
-    inset  1px  1px 0 #dfdfdf;
-  border-radius: 0 !important;
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 2px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.55);
   overflow: hidden;
 }
 
-/* ── Title bar ───────────────────────────────── */
+/* ── Header bar ────────────────────────────── */
 
 .glass-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 3px 4px 3px 6px;
-  background: linear-gradient(to right, var(--title-from), var(--title-to));
-  font-family: 'VT323', monospace;
-  font-size: 15px;
+  padding: 7px 14px;
+  background: var(--panel-lo);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 12px;
   letter-spacing: 0.06em;
-  font-weight: bold;
-  color: #ffffff;
+  color: var(--tp);
   user-select: none;
   flex-shrink: 0;
 }
 
-/* ── Win95 control buttons ───────────────────── */
+/* ── Control dots ──────────────────────────── */
 
-.ctrl-btns {
-  display: flex;
-  gap: 2px;
-  flex-shrink: 0;
-}
-
+.ctrl-btns { display: flex; gap: 5px; flex-shrink: 0; }
 .ctrl-btn {
-  width: 18px;
-  height: 14px;
-  background: var(--win-mid);
-  border: 2px solid;
-  border-color: var(--win-hi) var(--win-lo) var(--win-lo) var(--win-hi);
-  box-shadow: inset -1px -1px 0 var(--win-dark), inset 1px 1px 0 #dfdfdf;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'VT323', monospace;
-  font-size: 12px;
-  font-weight: bold;
-  color: var(--tp);
-  cursor: default;
-  line-height: 1;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  display: inline-block;
+  font-size: 0;
 }
 
-.ctrl-btn:active {
-  border-color: var(--win-lo) var(--win-hi) var(--win-hi) var(--win-lo);
-}
-
-/* ── Buttons ─────────────────────────────────── */
+/* ── Buttons ───────────────────────────────── */
 
 .glass-btn {
-  background: var(--win-mid);
-  border: 2px solid;
-  border-color: var(--win-hi) var(--win-lo) var(--win-lo) var(--win-hi);
-  box-shadow: inset -1px -1px 0 var(--win-dark), inset 1px 1px 0 #dfdfdf;
-  padding: 3px 14px 4px;
-  font-family: 'VT323', monospace;
-  font-size: 14px;
-  font-weight: bold;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 2px;
+  padding: 4px 14px 5px;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 12px;
   letter-spacing: 0.04em;
   color: var(--tp);
   cursor: pointer;
   white-space: nowrap;
-  border-radius: 0 !important;
+  transition: background 0.12s, border-color 0.12s;
 }
 
 .glass-btn:hover {
-  background: #d4d0c8;
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.20);
 }
 
-.glass-btn:active {
-  border-color: var(--win-lo) var(--win-hi) var(--win-hi) var(--win-lo);
-  box-shadow: inset 1px 1px 0 var(--win-dark), inset -1px -1px 0 #dfdfdf;
-  padding-top: 4px;
-  padding-left: 15px;
-}
-
-.glass-btn:disabled {
-  color: var(--win-dark);
-  text-shadow: 1px 1px 0 rgba(255,255,255,0.7);
-  cursor: not-allowed;
-}
+.glass-btn:active  { background: rgba(255,255,255,0.02); }
+.glass-btn:disabled { opacity: 0.32; cursor: not-allowed; }
 
 .glass-btn-primary {
-  background: var(--win-mid);
-  border-color: var(--win-hi) var(--win-lo) var(--win-lo) var(--win-hi);
-  /* default button has extra outer border in Win95 */
-  outline: 1px solid var(--tp);
-  outline-offset: -4px;
+  color: var(--accent);
+  border-color: rgba(232,237,242,0.35);
+  background: rgba(232,237,242,0.06);
+}
+
+.glass-btn-primary:hover {
+  background: rgba(232,237,242,0.12);
+  border-color: rgba(232,237,242,0.55);
 }
 
 .glass-btn-danger {
   color: var(--failed);
+  border-color: rgba(192,80,96,0.30);
 }
 
 .glass-btn-danger:hover {
-  color: #cc0000;
+  background: rgba(192,80,96,0.08);
+  border-color: rgba(192,80,96,0.50);
 }
 
-/* ── Inputs ──────────────────────────────────── */
+/* ── Inputs ────────────────────────────────── */
 
 .glass-input {
-  background: #ffffff;
-  border: 2px solid;
-  border-color: var(--win-lo) var(--win-hi) var(--win-hi) var(--win-lo);
-  box-shadow: inset 1px 1px 0 var(--win-dark);
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 2px;
   color: var(--tp);
-  font-family: 'VT323', monospace;
-  font-size: 14px;
-  padding: 4px 8px;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 13px;
+  padding: 6px 10px;
   outline: none;
   width: 100%;
-  border-radius: 0 !important;
+  transition: border-color 0.12s;
+  caret-color: var(--tp);
 }
 
-.glass-input:focus {
-  outline: 1px dotted var(--tp);
-  outline-offset: -4px;
-}
+.glass-input:focus { border-color: rgba(232,237,242,0.40); }
+.glass-input::placeholder { color: var(--td); }
 
-.glass-input::placeholder {
-  color: var(--td);
-}
-
-/* ── Status chips ────────────────────────────── */
+/* ── Status chips ──────────────────────────── */
 
 .chip {
   display: inline-flex;
   align-items: center;
-  padding: 0 6px;
-  font-family: 'VT323', monospace;
-  font-size: 12px;
-  font-weight: bold;
-  letter-spacing: 0.06em;
-  border: 1px solid var(--win-dark);
+  padding: 1px 7px;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  border: 1px solid;
+  border-radius: 2px;
   text-transform: uppercase;
   flex-shrink: 0;
-  border-radius: 0 !important;
-  background: var(--win-bg);
 }
 
-.chip-merged {
-  color: var(--merged);
-  border-color: var(--merged);
-  background: #e8ffe8;
-}
+.chip-merged { color: var(--merged);  border-color: rgba(61,170,128,0.35);  background: rgba(61,170,128,0.07);  }
+.chip-failed { color: var(--failed);  border-color: rgba(192,80,96,0.30);   background: rgba(192,80,96,0.06);   }
+.chip-stale  { color: var(--stale);   border-color: rgba(184,144,64,0.30);  background: rgba(184,144,64,0.06);  }
+.chip-muted  { color: var(--tm);      border-color: rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); }
 
-.chip-failed {
-  color: var(--failed);
-  border-color: var(--failed);
-  background: #ffe8e8;
-}
+/* ── Scrollbar ─────────────────────────────── */
 
-.chip-stale {
-  color: var(--stale);
-  border-color: var(--stale);
-  background: #fff5e0;
-}
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
 
-.chip-muted {
-  color: var(--td);
-  border-color: var(--win-dark);
-  background: var(--win-bg);
-}
-
-/* ── Scrollbar ───────────────────────────────── */
-
-::-webkit-scrollbar {
-  width: 16px;
-  height: 16px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--win-bg);
-  border-left: 1px solid var(--win-dark);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--win-mid);
-  border: 2px solid;
-  border-color: var(--win-hi) var(--win-lo) var(--win-lo) var(--win-hi);
-  box-shadow: inset -1px -1px 0 var(--win-dark), inset 1px 1px 0 #dfdfdf;
-}
-
-::-webkit-scrollbar-button {
-  background: var(--win-mid);
-  border: 2px solid;
-  border-color: var(--win-hi) var(--win-lo) var(--win-lo) var(--win-hi);
-  display: block;
-  height: 16px;
-}
-
-/* ── Divider (Win95 sunken line) ─────────────── */
+/* ── Divider ───────────────────────────────── */
 
 .divider {
-  height: 2px;
-  border-top: 1px solid var(--win-dark);
-  border-bottom: 1px solid var(--win-hi);
-  background: transparent;
+  height: 1px;
+  background: rgba(255,255,255,0.06);
 }
 
-/* ── Stat card ───────────────────────────────── */
+/* ── Stat card ─────────────────────────────── */
 
 .stat-card {
-  background: var(--win-bg);
-  border: 2px solid;
-  border-color: var(--win-lo) var(--win-hi) var(--win-hi) var(--win-lo);
-  box-shadow: inset 1px 1px 0 var(--win-dark);
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 2px;
   padding: 10px 14px;
 }
 
-/* ── Status color helpers ────────────────────── */
+/* ── Status helpers ────────────────────────── */
 
 .c-merged { color: var(--merged); }
 .c-failed { color: var(--failed); }
 .c-stale  { color: var(--stale);  }
-.c-muted  { color: var(--td);     }
+.c-muted  { color: var(--tm);     }
 
-/* ── Glow / pixel helpers ────────────────────── */
-
-.glow-sm { }
-.glow-md { }
+.glow-sm {}
+.glow-md {}
 
 .pixel-grid {
-  background-image: radial-gradient(rgba(0,0,0,0.08) 1px, transparent 1px);
-  background-size: 12px 12px;
+  background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* ── Accent label utility ──────────────────── */
+
+.label-accent {
+  color: var(--accent);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }

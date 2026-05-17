@@ -58,14 +58,18 @@ Strict rules:
 - No vague summaries.
 - Be direct and technical.`
 
-  const resp = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1500,
-    messages: [{ role: 'user', content: prompt }],
-  })
-
-  const text = resp.content[0].type === 'text' ? resp.content[0].text : ''
-  return parseResponse(text)
+  try {
+    const resp = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1500,
+      messages: [{ role: 'user', content: prompt }],
+    })
+    const text = resp.content[0].type === 'text' ? resp.content[0].text : ''
+    return parseResponse(text)
+  } catch (e) {
+    console.error('Claude API error, using fallback:', e)
+    return buildFallback(prs, failedJobs)
+  }
 }
 
 function parseResponse(text: string): DigestContent {

@@ -50,7 +50,7 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
       doc.text(repo.full_name, 14, 14)
       doc.setFontSize(8)
       doc.setFont('courier', 'normal')
-      doc.setTextColor(140, 140, 140)
+      doc.setTextColor(210, 210, 210)
       doc.text(`${formatDate(digest.period_start)} — ${formatDate(digest.period_end)}`, 14, 21)
       doc.text(`Generated: ${formatDate(digest.created_at)}`, 14, 27)
       y = 40
@@ -69,7 +69,7 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
         const x = 14 + i * 36 + 4
         doc.setFontSize(14); doc.setFont('courier', 'bold'); doc.setTextColor(220, 220, 220)
         doc.text(s.value, x, y + 9)
-        doc.setFontSize(7); doc.setFont('courier', 'normal'); doc.setTextColor(120, 120, 120)
+        doc.setFontSize(7); doc.setFont('courier', 'normal'); doc.setTextColor(248, 248, 248)
         doc.text(s.label, x, y + 15)
       })
       y += 26
@@ -81,17 +81,17 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
       }
 
       doc.setDrawColor(60, 60, 60); doc.line(14, y, W - 14, y); y += 6
-      doc.setFontSize(9); doc.setFont('courier', 'bold'); doc.setTextColor(200, 200, 200)
+      doc.setFontSize(9); doc.setFont('courier', 'bold'); doc.setTextColor(248, 248, 248)
       doc.text('SUMMARY', 14, y); y += 5
-      doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(170, 170, 170)
+      doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(238, 238, 238)
       const summaryLines = doc.splitTextToSize(digest.summary ?? '', W - 28)
       doc.text(summaryLines, 14, y); y += summaryLines.length * 4 + 6
 
       if (keyChanges.length > 0) {
         doc.line(14, y, W - 14, y); y += 6
-        doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(200, 200, 200)
+        doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(248, 248, 248)
         doc.text('KEY CHANGES', 14, y); y += 5
-        doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(170, 170, 170)
+        doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(238, 238, 238)
         for (const kc of keyChanges) {
           const lines = doc.splitTextToSize(`+ ${kc}`, W - 30)
           doc.text(lines, 16, y); y += lines.length * 4 + 2
@@ -100,7 +100,7 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
       }
 
       doc.line(14, y, W - 14, y); y += 6
-      doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(200, 200, 200)
+      doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(248, 248, 248)
       doc.text('PULL REQUESTS', 14, y); y += 5
 
       for (const pr of prs.slice(0, 20)) {
@@ -111,18 +111,18 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
         doc.setTextColor(180, 180, 180); doc.setFont('courier', 'normal')
         const title = doc.splitTextToSize(`#${pr.number} ${pr.title} (${pr.author})`, W - 52)
         doc.text(title, 42, y)
-        doc.setTextColor(100, 100, 100); doc.text(`${pr.size} +${pr.additions}/-${pr.deletions}`, W - 28, y)
+        doc.setTextColor(195, 195, 195); doc.text(`${pr.size} +${pr.additions}/-${pr.deletions}`, W - 28, y)
         y += title.length * 3.5 + 2
       }
 
       if (contributors.length > 0) {
         if (y > 240) { doc.addPage(); y = 20 }
         y += 4; doc.line(14, y, W - 14, y); y += 6
-        doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(200, 200, 200)
+        doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(248, 248, 248)
         doc.text('CONTRIBUTORS', 14, y); y += 5
-        doc.setFontSize(7); doc.setTextColor(120, 120, 120)
+        doc.setFontSize(7); doc.setTextColor(248, 248, 248)
         doc.text('Author', 14, y); doc.text('PRs', 80, y); doc.text('Merged', 100, y); doc.text('Rate', 130, y)
-        y += 4; doc.setTextColor(170, 170, 170)
+        y += 4; doc.setTextColor(238, 238, 238)
         for (const c of contributors.slice(0, 10)) {
           doc.text(c.author.slice(0, 24), 14, y); doc.text(String(c.prs), 80, y)
           doc.text(String(c.merged), 100, y); doc.text(`${c.rate}%`, 130, y)
@@ -133,9 +133,9 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
       if (digest.release_notes) {
         if (y > 240) { doc.addPage(); y = 20 }
         y += 4; doc.line(14, y, W - 14, y); y += 6
-        doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(200, 200, 200)
+        doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(248, 248, 248)
         doc.text('RELEASE NOTES', 14, y); y += 5
-        doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(160, 160, 160)
+        doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(235, 235, 235)
         const rnLines = doc.splitTextToSize(digest.release_notes, W - 28)
         doc.text(rnLines, 14, y)
       }
@@ -213,7 +213,7 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
             style={{ borderRight: i < 4 ? '1px solid var(--border)' : 'none', textAlign: 'center' }}
           >
             <div style={{ fontSize: 18, fontWeight: 300, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: 9, color: 'var(--tm)', letterSpacing: '0.07em', textTransform: 'uppercase', marginTop: 2 }}>
+            <div style={{ fontSize: 9, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 2 }}>
               {s.label}
             </div>
           </div>
@@ -222,7 +222,7 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
 
       {/* PR size distribution */}
       <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ fontSize: 9, color: 'var(--tm)', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 5 }}>
+        <div style={{ fontSize: 9, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 5 }}>
           PR Size Distribution
         </div>
         <div

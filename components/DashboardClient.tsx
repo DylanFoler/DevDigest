@@ -49,7 +49,8 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
       if (!res.ok) throw new Error(data.error)
       setDigests((prev) => [data.digest, ...prev])
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to generate report')
+      const raw = e instanceof Error ? e.message : ''
+      setError(raw.startsWith('{') ? 'Report generation failed — check server logs' : (raw || 'Failed to generate report'))
     } finally {
       setGeneratingFor(null)
     }
@@ -59,9 +60,9 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
     <main className="flex-1 flex flex-col overflow-hidden" style={{ minWidth: 0 }}>
       {/* Top bar */}
       <div className="glass-header" style={{ borderBottom: '1px solid var(--border)', borderRadius: 0, flexShrink: 0 }}>
-        <div className="flex items-center gap-2">
-          <span style={{ fontWeight: 600, fontSize: 13 }}>Dashboard</span>
-          <span style={{ color: 'var(--tm)', fontSize: 11 }}>— {githubLogin}</span>
+        <div className="flex items-center gap-3">
+          <span style={{ color: 'var(--accent)', letterSpacing: '0.10em', textTransform: 'uppercase', fontSize: 12 }}>Dashboard</span>
+          <span style={{ color: 'var(--tm)', fontSize: 12 }}>/ {githubLogin}</span>
         </div>
         <button className="glass-btn glass-btn-primary" style={{ fontSize: 11 }} onClick={() => setShowModal(true)}>
           + Connect Repo
@@ -87,8 +88,8 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
             className="stat-card"
             style={{ borderRight: i < 2 ? '1px solid var(--b1)' : 'none', textAlign: 'center' }}
           >
-            <div style={{ fontSize: 26, fontWeight: 300, color: 'var(--tp)' }}>{s.value}</div>
-            <div style={{ fontSize: 9, color: 'var(--tm)', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 2 }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--tp)', fontFamily: "'Share Tech Mono', monospace" }}>{s.value}</div>
+            <div style={{ fontSize: 9, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 3 }}>
               {s.label}
             </div>
           </div>
@@ -180,8 +181,8 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
                               textAlign: 'center',
                             }}
                           >
-                            <div style={{ fontSize: 16, fontWeight: 300, color: s.color }}>{s.value}</div>
-                            <div style={{ fontSize: 9, color: 'var(--tm)', letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: 2 }}>{s.label}</div>
+                            <div style={{ fontSize: 20, fontWeight: 700, color: s.color, fontFamily: "'VT323', monospace" }}>{s.value}</div>
+                            <div style={{ fontSize: 11, color: 'var(--tm)', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 2 }}>{s.label}</div>
                           </div>
                         ))}
                       </div>

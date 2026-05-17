@@ -10,12 +10,11 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"VT323"', '"Courier New"', 'monospace'],
-        mono: ['"VT323"', '"Courier New"', 'monospace'],
-        vt:   ['"VT323"', '"Courier New"', 'monospace'],
+        sans: ['"Share Tech Mono"', '"Courier New"', 'monospace'],
+        mono: ['"Share Tech Mono"', '"Courier New"', 'monospace'],
       },
       colors: {
-        bg: '#0a0018',
+        bg: '#0a0a0f',
       },
       keyframes: {
         pulse2: {

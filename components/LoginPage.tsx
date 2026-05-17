@@ -17,83 +17,60 @@ export default function LoginPage() {
     >
       <GeometricBackground />
 
-      <div className="relative z-10 w-full max-w-[320px] mx-4">
+      <div className="relative z-10 w-full max-w-[340px] mx-4">
         <div className="glass-panel">
-          {/* Title bar */}
           <div className="glass-header">
-            <div className="flex items-center gap-2">
-              <span>DevDigest</span>
-            </div>
-            <div className="ctrl-btns">
-              <span className="ctrl-btn">_</span>
-              <span className="ctrl-btn">□</span>
-              <span className="ctrl-btn">×</span>
-            </div>
+            <span style={{ color: 'var(--accent)', letterSpacing: '0.12em' }}>DevDigest</span>
+            <span style={{ fontSize: 9, color: 'var(--td)' }}>v1.0</span>
           </div>
 
-          {/* Content */}
-          <div className="pixel-grid" style={{ padding: '20px 18px' }}>
-            {/* App name */}
-            <div className="flex flex-col items-center mb-5">
-              <div style={{ fontSize: 42, marginBottom: 2 }}>🖥️</div>
-              <h1
-                style={{
-                  fontFamily: "'VT323', monospace",
-                  fontSize: 26,
-                  letterSpacing: '0.15em',
-                  textTransform: 'uppercase',
-                  color: 'var(--tp)',
-                }}
-              >
-                DevDigest
-              </h1>
-              <p style={{ fontSize: 12, color: 'var(--td)', letterSpacing: '0.08em', marginTop: 1 }}>
-                PR Intelligence v1.0
-              </p>
+          <div className="pixel-grid" style={{ padding: '28px 24px' }}>
+            {/* Title block */}
+            <div style={{ marginBottom: 22 }}>
+              <div style={{
+                fontSize: 11,
+                color: 'var(--accent)',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                marginBottom: 6,
+              }}>
+                PR Intelligence Platform
+              </div>
+              <div style={{
+                fontSize: 11,
+                color: 'var(--tm)',
+                lineHeight: 1.6,
+              }}>
+                Track pull request activity, generate AI summaries, and surface
+                CI failures across your GitHub repos.
+              </div>
             </div>
 
-            {/* Divider */}
-            <div className="divider mb-4" />
+            <div className="divider" style={{ marginBottom: 20 }} />
 
             {/* Features */}
-            <ul className="mb-5" style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
               {FEATURES.map((f) => (
-                <li
-                  key={f}
-                  style={{ fontSize: 13, color: 'var(--tm)', display: 'flex', gap: 6, fontFamily: "'VT323', monospace" }}
-                >
-                  <span style={{ color: 'var(--tp)', flexShrink: 0 }}>▸</span>
+                <li key={f} style={{
+                  fontSize: 12,
+                  color: 'var(--tm)',
+                  display: 'flex',
+                  gap: 10,
+                  lineHeight: 1.45,
+                }}>
+                  <span style={{ color: 'var(--accent)', flexShrink: 0 }}>+</span>
                   <span>{f}</span>
                 </li>
               ))}
             </ul>
 
-            {/* CTA */}
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button
-                onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
-                className="glass-btn glass-btn-primary"
-                style={{ fontSize: 14, padding: '6px 24px', letterSpacing: '0.06em' }}
-              >
-                Connect GitHub
-              </button>
-            </div>
-          </div>
-
-          {/* Status bar */}
-          <div
-            style={{
-              borderTop: '2px solid',
-              borderColor: 'var(--win-lo) var(--win-hi) var(--win-hi) var(--win-lo)',
-              padding: '3px 8px',
-              fontSize: 11,
-              color: 'var(--td)',
-              background: 'var(--win-bg)',
-              fontFamily: "'VT323', monospace",
-              letterSpacing: '0.04em',
-            }}
-          >
-            Requires GitHub OAuth — repo scope
+            <button
+              onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
+              className="glass-btn glass-btn-primary w-full"
+              style={{ fontSize: 12, padding: '9px 14px', letterSpacing: '0.08em' }}
+            >
+              Connect GitHub
+            </button>
           </div>
         </div>
       </div>

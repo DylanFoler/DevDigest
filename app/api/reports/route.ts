@@ -43,8 +43,15 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { repo_id } = await req.json()
+  let repo_id: string
+  try {
+    const body = await req.json()
+    repo_id = body.repo_id
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
 
+  try {
   const userId = await getOrCreateUserId(session)
   if (!userId) return NextResponse.json({ error: 'User not found' }, { status: 404 })
   const user = { id: userId }
@@ -159,4 +166,9 @@ export async function POST(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ digest })
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Report generation failed'
+    console.error('report generation error:', e)
+    return NextResponse.json({ error: msg }, { status: 500 })
+  }
 }
