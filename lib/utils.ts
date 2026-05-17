@@ -41,6 +41,18 @@ export function formatDateShort(dateString: string | null): string {
   })
 }
 
+export function formatDigestPeriod(start: string | null, end: string | null): string {
+  const s = formatDateShort(start)
+  const e = formatDateShort(end)
+  return s === e || !end ? s : `${s} — ${e}`
+}
+
+export function formatDigestPeriodFull(start: string | null, end: string | null): string {
+  const s = formatDate(start)
+  const e = formatDate(end)
+  return s === e || !end ? s : `${s} — ${e}`
+}
+
 export function getContributorStats(prs: PullRequest[]): ContributorStat[] {
   const map = new Map<string, { prs: number; merged: number }>()
 

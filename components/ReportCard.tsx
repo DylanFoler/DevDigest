@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import type { Digest, Repo, ContributorStat } from '@/types'
-import { formatDate, formatDateShort, formatHours, getContributorStats } from '@/lib/utils'
+import { formatDate, formatDateShort, formatHours, formatDigestPeriod, formatDigestPeriodFull, getContributorStats } from '@/lib/utils'
 
 interface Props {
   digest: Digest
@@ -51,7 +51,7 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
       doc.setFontSize(8)
       doc.setFont('courier', 'normal')
       doc.setTextColor(210, 210, 210)
-      doc.text(`${formatDate(digest.period_start)} — ${formatDate(digest.period_end)}`, 14, 21)
+      doc.text(formatDigestPeriodFull(digest.period_start, digest.period_end), 14, 21)
       doc.text(`Generated: ${formatDate(digest.created_at)}`, 14, 27)
       y = 40
 
@@ -75,23 +75,23 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
       y += 26
 
       if (hasFailed) {
-        doc.setFontSize(8); doc.setTextColor(248, 113, 113)
+        doc.setFontSize(8); doc.setTextColor(180, 30, 50)
         doc.text('FAILED CI: ' + digest.failed_job_names.join(', '), 14, y)
         y += 8
       }
 
-      doc.setDrawColor(60, 60, 60); doc.line(14, y, W - 14, y); y += 6
-      doc.setFontSize(9); doc.setFont('courier', 'bold'); doc.setTextColor(248, 248, 248)
+      doc.setDrawColor(200, 200, 200); doc.line(14, y, W - 14, y); y += 6
+      doc.setFontSize(9); doc.setFont('courier', 'bold'); doc.setTextColor(20, 20, 20)
       doc.text('SUMMARY', 14, y); y += 5
-      doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(238, 238, 238)
+      doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(30, 30, 30)
       const summaryLines = doc.splitTextToSize(digest.summary ?? '', W - 28)
       doc.text(summaryLines, 14, y); y += summaryLines.length * 4 + 6
 
       if (keyChanges.length > 0) {
         doc.line(14, y, W - 14, y); y += 6
-        doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(248, 248, 248)
+        doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(20, 20, 20)
         doc.text('KEY CHANGES', 14, y); y += 5
-        doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(238, 238, 238)
+        doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(30, 30, 30)
         for (const kc of keyChanges) {
           const lines = doc.splitTextToSize(`+ ${kc}`, W - 30)
           doc.text(lines, 16, y); y += lines.length * 4 + 2
@@ -100,29 +100,29 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
       }
 
       doc.line(14, y, W - 14, y); y += 6
-      doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(248, 248, 248)
+      doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(20, 20, 20)
       doc.text('PULL REQUESTS', 14, y); y += 5
 
       for (const pr of prs.slice(0, 20)) {
         if (y > 265) { doc.addPage(); y = 20 }
-        const sc = pr.merged ? [134, 239, 172] : pr.is_stale ? [253, 186, 116] : [140, 140, 140]
+        const sc = pr.merged ? [0, 130, 70] : pr.is_stale ? [170, 90, 0] : [80, 80, 80]
         doc.setTextColor(sc[0], sc[1], sc[2]); doc.setFont('courier', 'bold'); doc.setFontSize(7)
         doc.text(`[${pr.merged ? 'MERGED' : pr.state.toUpperCase()}]`, 14, y)
-        doc.setTextColor(180, 180, 180); doc.setFont('courier', 'normal')
+        doc.setTextColor(20, 20, 20); doc.setFont('courier', 'normal')
         const title = doc.splitTextToSize(`#${pr.number} ${pr.title} (${pr.author})`, W - 52)
         doc.text(title, 42, y)
-        doc.setTextColor(195, 195, 195); doc.text(`${pr.size} +${pr.additions}/-${pr.deletions}`, W - 28, y)
+        doc.setTextColor(90, 90, 90); doc.text(`${pr.size} +${pr.additions}/-${pr.deletions}`, W - 28, y)
         y += title.length * 3.5 + 2
       }
 
       if (contributors.length > 0) {
         if (y > 240) { doc.addPage(); y = 20 }
         y += 4; doc.line(14, y, W - 14, y); y += 6
-        doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(248, 248, 248)
+        doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(20, 20, 20)
         doc.text('CONTRIBUTORS', 14, y); y += 5
-        doc.setFontSize(7); doc.setTextColor(248, 248, 248)
+        doc.setFontSize(7); doc.setTextColor(60, 60, 60)
         doc.text('Author', 14, y); doc.text('PRs', 80, y); doc.text('Merged', 100, y); doc.text('Rate', 130, y)
-        y += 4; doc.setTextColor(238, 238, 238)
+        y += 4; doc.setTextColor(20, 20, 20)
         for (const c of contributors.slice(0, 10)) {
           doc.text(c.author.slice(0, 24), 14, y); doc.text(String(c.prs), 80, y)
           doc.text(String(c.merged), 100, y); doc.text(`${c.rate}%`, 130, y)
@@ -133,9 +133,9 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
       if (digest.release_notes) {
         if (y > 240) { doc.addPage(); y = 20 }
         y += 4; doc.line(14, y, W - 14, y); y += 6
-        doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(248, 248, 248)
+        doc.setFont('courier', 'bold'); doc.setFontSize(9); doc.setTextColor(20, 20, 20)
         doc.text('RELEASE NOTES', 14, y); y += 5
-        doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(235, 235, 235)
+        doc.setFont('courier', 'normal'); doc.setFontSize(8); doc.setTextColor(30, 30, 30)
         const rnLines = doc.splitTextToSize(digest.release_notes, W - 28)
         doc.text(rnLines, 14, y)
       }
@@ -160,7 +160,7 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
         <div className="flex items-center gap-3 min-w-0">
           <span style={{ fontSize: 13, fontWeight: 500 }}>{repo.full_name}</span>
           <span style={{ color: 'var(--tm)', fontSize: 11 }}>
-            {formatDateShort(digest.period_start)} — {formatDateShort(digest.period_end)}
+            {formatDigestPeriod(digest.period_start, digest.period_end)}
           </span>
           {hasFailed && <span className="chip chip-failed">CI Fail</span>}
         </div>
