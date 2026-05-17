@@ -1,0 +1,306 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Authentic Windows 95 palette ───────────── */
+
+:root {
+  /* Desktop & surfaces */
+  --bg:       #008080;   /* classic Win95 teal desktop */
+  --win-bg:   #c0c0c0;   /* silver window face */
+  --win-dark: #808080;   /* shadow edge */
+  --win-lo:   #404040;   /* dark shadow edge */
+  --win-hi:   #ffffff;   /* highlight edge */
+  --win-mid:  #c0c0c0;   /* button face */
+
+  /* Title bar (active) */
+  --title-from: #000080;
+  --title-to:   #1084d0;
+
+  /* Text */
+  --tp:  #000000;
+  --tm:  #444444;
+  --td:  #808080;
+
+  /* Status */
+  --merged: #008000;
+  --failed: #800000;
+  --stale:  #7a4800;
+
+  /* Backward-compat aliases used by inline styles */
+  --b1:        #808080;
+  --b2:        #404040;
+  --s1:        rgba(0, 0, 0, 0.04);
+  --s2:        rgba(0, 0, 0, 0.07);
+  --s3:        rgba(0, 0, 0, 0.11);
+  --border:    #808080;
+  --border-hi: #404040;
+  --glass:     #c0c0c0;
+  --glass-hi:  #d4d0c8;
+  --glass-lo:  #a8a8a8;
+  --radius:    0px;
+  --radius-sm: 0px;
+
+  /* Neon aliases remapped to Win95 blues */
+  --neon-pink:   #000080;
+  --neon-cyan:   #000080;
+  --neon-purple: #1084d0;
+  --neon-mint:   #008000;
+  --neon-yellow: #7a4800;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--tp);
+  font-family: 'VT323', 'MS Sans Serif', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-font-smoothing: none;
+}
+
+/* ── Win95 panel / window ────────────────────── */
+
+.glass-panel {
+  background: var(--win-bg);
+  border: 2px solid;
+  border-color: var(--win-hi) var(--win-lo) var(--win-lo) var(--win-hi);
+  box-shadow:
+    inset -1px -1px 0 var(--win-dark),
+    inset  1px  1px 0 #dfdfdf;
+  border-radius: 0 !important;
+  overflow: hidden;
+}
+
+/* ── Title bar ───────────────────────────────── */
+
+.glass-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 4px 3px 6px;
+  background: linear-gradient(to right, var(--title-from), var(--title-to));
+  font-family: 'VT323', monospace;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  font-weight: bold;
+  color: #ffffff;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* ── Win95 control buttons ───────────────────── */
+
+.ctrl-btns {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.ctrl-btn {
+  width: 18px;
+  height: 14px;
+  background: var(--win-mid);
+  border: 2px solid;
+  border-color: var(--win-hi) var(--win-lo) var(--win-lo) var(--win-hi);
+  box-shadow: inset -1px -1px 0 var(--win-dark), inset 1px 1px 0 #dfdfdf;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'VT323', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--tp);
+  cursor: default;
+  line-height: 1;
+}
+
+.ctrl-btn:active {
+  border-color: var(--win-lo) var(--win-hi) var(--win-hi) var(--win-lo);
+}
+
+/* ── Buttons ─────────────────────────────────── */
+
+.glass-btn {
+  background: var(--win-mid);
+  border: 2px solid;
+  border-color: var(--win-hi) var(--win-lo) var(--win-lo) var(--win-hi);
+  box-shadow: inset -1px -1px 0 var(--win-dark), inset 1px 1px 0 #dfdfdf;
+  padding: 3px 14px 4px;
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  color: var(--tp);
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: 0 !important;
+}
+
+.glass-btn:hover {
+  background: #d4d0c8;
+}
+
+.glass-btn:active {
+  border-color: var(--win-lo) var(--win-hi) var(--win-hi) var(--win-lo);
+  box-shadow: inset 1px 1px 0 var(--win-dark), inset -1px -1px 0 #dfdfdf;
+  padding-top: 4px;
+  padding-left: 15px;
+}
+
+.glass-btn:disabled {
+  color: var(--win-dark);
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.7);
+  cursor: not-allowed;
+}
+
+.glass-btn-primary {
+  background: var(--win-mid);
+  border-color: var(--win-hi) var(--win-lo) var(--win-lo) var(--win-hi);
+  /* default button has extra outer border in Win95 */
+  outline: 1px solid var(--tp);
+  outline-offset: -4px;
+}
+
+.glass-btn-danger {
+  color: var(--failed);
+}
+
+.glass-btn-danger:hover {
+  color: #cc0000;
+}
+
+/* ── Inputs ──────────────────────────────────── */
+
+.glass-input {
+  background: #ffffff;
+  border: 2px solid;
+  border-color: var(--win-lo) var(--win-hi) var(--win-hi) var(--win-lo);
+  box-shadow: inset 1px 1px 0 var(--win-dark);
+  color: var(--tp);
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  padding: 4px 8px;
+  outline: none;
+  width: 100%;
+  border-radius: 0 !important;
+}
+
+.glass-input:focus {
+  outline: 1px dotted var(--tp);
+  outline-offset: -4px;
+}
+
+.glass-input::placeholder {
+  color: var(--td);
+}
+
+/* ── Status chips ────────────────────────────── */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 6px;
+  font-family: 'VT323', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--win-dark);
+  text-transform: uppercase;
+  flex-shrink: 0;
+  border-radius: 0 !important;
+  background: var(--win-bg);
+}
+
+.chip-merged {
+  color: var(--merged);
+  border-color: var(--merged);
+  background: #e8ffe8;
+}
+
+.chip-failed {
+  color: var(--failed);
+  border-color: var(--failed);
+  background: #ffe8e8;
+}
+
+.chip-stale {
+  color: var(--stale);
+  border-color: var(--stale);
+  background: #fff5e0;
+}
+
+.chip-muted {
+  color: var(--td);
+  border-color: var(--win-dark);
+  background: var(--win-bg);
+}
+
+/* ── Scrollbar ───────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--win-bg);
+  border-left: 1px solid var(--win-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--win-mid);
+  border: 2px solid;
+  border-color: var(--win-hi) var(--win-lo) var(--win-lo) var(--win-hi);
+  box-shadow: inset -1px -1px 0 var(--win-dark), inset 1px 1px 0 #dfdfdf;
+}
+
+::-webkit-scrollbar-button {
+  background: var(--win-mid);
+  border: 2px solid;
+  border-color: var(--win-hi) var(--win-lo) var(--win-lo) var(--win-hi);
+  display: block;
+  height: 16px;
+}
+
+/* ── Divider (Win95 sunken line) ─────────────── */
+
+.divider {
+  height: 2px;
+  border-top: 1px solid var(--win-dark);
+  border-bottom: 1px solid var(--win-hi);
+  background: transparent;
+}
+
+/* ── Stat card ───────────────────────────────── */
+
+.stat-card {
+  background: var(--win-bg);
+  border: 2px solid;
+  border-color: var(--win-lo) var(--win-hi) var(--win-hi) var(--win-lo);
+  box-shadow: inset 1px 1px 0 var(--win-dark);
+  padding: 10px 14px;
+}
+
+/* ── Status color helpers ────────────────────── */
+
+.c-merged { color: var(--merged); }
+.c-failed { color: var(--failed); }
+.c-stale  { color: var(--stale);  }
+.c-muted  { color: var(--td);     }
+
+/* ── Glow / pixel helpers ────────────────────── */
+
+.glow-sm { }
+.glow-md { }
+
+.pixel-grid {
+  background-image: radial-gradient(rgba(0,0,0,0.08) 1px, transparent 1px);
+  background-size: 12px 12px;
+}
