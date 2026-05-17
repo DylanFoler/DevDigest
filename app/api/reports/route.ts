@@ -106,7 +106,7 @@ export async function POST(req: Request) {
   const { data: runsData } = await octokit.actions.listWorkflowRunsForRepo({
     owner: repo.owner,
     repo: repo.name,
-    per_page: 10,
+    per_page: 20,
   })
 
   const workflow_runs: WorkflowRun[] = runsData.workflow_runs.map((r) => ({
@@ -117,9 +117,18 @@ export async function POST(req: Request) {
     created_at: r.created_at,
   }))
 
-  const failedJobNames = Array.from(
-    new Set(workflow_runs.filter((r) => r.conclusion === 'failure').map((r) => r.name))
-  )
+  // Only flag a workflow as failing if its MOST RECENT run failed.
+  // Group by name, keep the latest run per workflow, check that one.
+  const latestByName = new Map<string, WorkflowRun>()
+  for (const run of workflow_runs) {
+    const existing = latestByName.get(run.name)
+    if (!existing || new Date(run.created_at) > new Date(existing.created_at)) {
+      latestByName.set(run.name, run)
+    }
+  }
+  const failedJobNames = Array.from(latestByName.values())
+    .filter((r) => r.conclusion === 'failure')
+    .map((r) => r.name)
 
   const dist: SizeDistribution = { xs: 0, s: 0, m: 0, l: 0 }
   for (const pr of prs) {
