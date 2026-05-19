@@ -296,6 +296,11 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
           }}
         >
           <span style={{ opacity: 0.5 }}>✦</span> AI Summary
+          {(digest.raw_data as { bot_pr_count?: number })?.bot_pr_count ? (
+            <span style={{ color: 'var(--td)', fontSize: 9, marginLeft: 6 }}>
+              {(digest.raw_data as { bot_pr_count?: number }).bot_pr_count} bot PRs excluded
+            </span>
+          ) : null}
         </div>
         <p style={{ fontSize: 12, color: 'var(--tp)', lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>
           {digest.summary ?? 'No summary generated.'}

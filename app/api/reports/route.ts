@@ -79,7 +79,12 @@ export async function POST(req: Request) {
   const periodStart = rawPRs.length > 0 ? rawPRs[rawPRs.length - 1].created_at : new Date().toISOString()
   const periodEnd = new Date().toISOString()
 
-  const prs: PullRequest[] = rawPRs.map((pr) => {
+  function isBot(login: string): boolean {
+    const l = login.toLowerCase()
+    return l.endsWith('[bot]') || l === 'dependabot' || l === 'renovate' || l === 'github-actions' || l === 'depfu' || l === 'snyk-bot'
+  }
+
+  const allPRs: PullRequest[] = rawPRs.map((pr) => {
     const merged = !!pr.merged_at
     const additions = (pr as { additions?: number }).additions ?? 0
     const deletions = (pr as { deletions?: number }).deletions ?? 0
@@ -101,6 +106,10 @@ export async function POST(req: Request) {
       is_stale: !merged && isStale(pr.updated_at),
     }
   })
+
+  // Filter out bot PRs for all metrics — store human PRs only
+  const prs = allPRs.filter((p) => !isBot(p.author))
+  const botPRCount = allPRs.length - prs.length
 
   // Fetch workflow runs
   const { data: runsData } = await octokit.actions.listWorkflowRunsForRepo({
@@ -168,7 +177,7 @@ export async function POST(req: Request) {
       stale_pr_count: prs.filter((p) => p.is_stale).length,
       failed_job_names: failedJobNames,
       release_notes,
-      raw_data: { prs, workflow_runs, key_changes },
+      raw_data: { prs, workflow_runs, key_changes, bot_pr_count: botPRCount },
     })
     .select()
     .single()

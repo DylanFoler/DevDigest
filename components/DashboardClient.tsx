@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import type { Repo, Digest } from '@/types'
 import ConnectRepoModal from './ConnectRepoModal'
-import { formatDate, formatHours } from '@/lib/utils'
+import { formatDate, formatHours, computeHealthScore, healthScoreColor, computeTrend, trendArrow, trendColor } from '@/lib/utils'
 
 interface Props {
   initialRepos: Repo[]
@@ -28,8 +28,8 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
       ? Math.round((cycleTimes.reduce((a, b) => a + b, 0) / cycleTimes.length) * 10) / 10
       : null
 
-  function latestDigestFor(repoId: string): Digest | undefined {
-    return digests.find((d) => d.repo_id === repoId)
+  function digestsFor(repoId: string): Digest[] {
+    return digests.filter((d) => d.repo_id === repoId)
   }
 
   function handleConnected(repo: Repo) {
@@ -124,7 +124,11 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
         ) : (
           <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {repos.map((repo) => {
-              const latest = latestDigestFor(repo.id)
+              const repoDigests = digestsFor(repo.id)
+              const latest = repoDigests[0]
+              const previous = repoDigests[1] ?? null
+              const trend = latest ? computeTrend(latest, previous) : null
+              const health = latest ? computeHealthScore(latest) : null
               const isGenerating = generatingFor === repo.id
               return (
                 <div key={repo.id} className="glass-panel">
@@ -138,6 +142,17 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
                       </Link>
                       {latest && latest.failed_job_names.length > 0 && (
                         <span className="chip chip-failed">CI Fail</span>
+                      )}
+                      {health !== null && (
+                        <span style={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          color: healthScoreColor(health),
+                          letterSpacing: '0.08em',
+                          opacity: 0.9,
+                        }}>
+                          {health}
+                        </span>
                       )}
                     </div>
                     <div className="flex gap-1">
@@ -166,10 +181,34 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
                         }}
                       >
                         {[
-                          { label: 'Merged', value: latest.merged_count, color: latest.merged_count > 0 ? 'var(--merged)' : 'var(--tm)' },
-                          { label: 'Open',   value: latest.open_count,   color: 'var(--tm)' },
-                          { label: 'Cycle',  value: formatHours(latest.avg_cycle_time_hours), color: 'var(--tp)' },
-                          { label: 'Stale',  value: latest.stale_pr_count, color: latest.stale_pr_count > 0 ? 'var(--stale)' : 'var(--tm)' },
+                          {
+                            label: 'Merged',
+                            value: latest.merged_count,
+                            color: latest.merged_count > 0 ? 'var(--merged)' : 'var(--tm)',
+                            delta: trend?.mergedDelta ?? null,
+                            lowerIsBetter: false,
+                          },
+                          {
+                            label: 'Open',
+                            value: latest.open_count,
+                            color: 'var(--tm)',
+                            delta: null,
+                            lowerIsBetter: true,
+                          },
+                          {
+                            label: 'Cycle',
+                            value: formatHours(latest.avg_cycle_time_hours),
+                            color: 'var(--tp)',
+                            delta: trend?.cycleDelta ?? null,
+                            lowerIsBetter: true,
+                          },
+                          {
+                            label: 'Stale',
+                            value: latest.stale_pr_count,
+                            color: latest.stale_pr_count > 0 ? 'var(--stale)' : 'var(--tm)',
+                            delta: trend?.staleDelta ?? null,
+                            lowerIsBetter: true,
+                          },
                         ].map((s) => (
                           <div
                             key={s.label}
@@ -181,7 +220,14 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
                               textAlign: 'center',
                             }}
                           >
-                            <div style={{ fontSize: 20, fontWeight: 700, color: s.color, fontFamily: "'VT323', monospace" }}>{s.value}</div>
+                            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 3 }}>
+                              <span style={{ fontSize: 20, fontWeight: 700, color: s.color, fontFamily: "'Share Tech Mono', monospace" }}>{s.value}</span>
+                              {s.delta !== null && s.delta !== 0 && (
+                                <span style={{ fontSize: 10, color: trendColor(s.delta, s.lowerIsBetter) }}>
+                                  {trendArrow(s.delta, s.lowerIsBetter)}
+                                </span>
+                              )}
+                            </div>
                             <div style={{ fontSize: 11, color: 'var(--tm)', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 2 }}>{s.label}</div>
                           </div>
                         ))}

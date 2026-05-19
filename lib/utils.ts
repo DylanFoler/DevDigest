@@ -1,4 +1,4 @@
-import type { PullRequest, ContributorStat } from '@/types'
+import type { PullRequest, ContributorStat, Digest } from '@/types'
 
 export function classifyPRSize(additions: number, deletions: number): 'XS' | 'S' | 'M' | 'L' {
   const total = additions + deletions
@@ -39,6 +39,71 @@ export function formatDateShort(dateString: string | null): string {
     month: 'short',
     day: 'numeric',
   })
+}
+
+export function computeHealthScore(digest: Digest): number {
+  let score = 100
+
+  if (digest.avg_cycle_time_hours !== null) {
+    if      (digest.avg_cycle_time_hours >= 48) score -= 25
+    else if (digest.avg_cycle_time_hours >= 24) score -= 15
+    else if (digest.avg_cycle_time_hours >= 12) score -= 8
+    else if (digest.avg_cycle_time_hours >= 4)  score -= 3
+  }
+
+  const open = Math.max(digest.open_count, 1)
+  const staleRatio = digest.stale_pr_count / open
+  if      (staleRatio >= 0.5)  score -= 20
+  else if (staleRatio >= 0.25) score -= 10
+  else if (staleRatio >  0)    score -= 4
+
+  score -= Math.min(30, digest.failed_job_names.length * 15)
+
+  if (digest.pr_count > 0) {
+    const rate = digest.merged_count / digest.pr_count
+    if      (rate < 0.3) score -= 15
+    else if (rate < 0.5) score -= 8
+    else if (rate < 0.7) score -= 3
+  }
+
+  return Math.max(0, Math.min(100, Math.round(score)))
+}
+
+export function healthScoreColor(score: number): string {
+  if (score >= 80) return '#3daa80'
+  if (score >= 60) return '#c8a860'
+  return '#c05060'
+}
+
+export interface DigestTrend {
+  mergedDelta: number | null
+  cycleDelta:  number | null
+  staleDelta:  number | null
+  scoreDelta:  number | null
+}
+
+export function computeTrend(current: Digest, previous: Digest | null): DigestTrend {
+  if (!previous) return { mergedDelta: null, cycleDelta: null, staleDelta: null, scoreDelta: null }
+  return {
+    mergedDelta: current.merged_count - previous.merged_count,
+    cycleDelta:
+      current.avg_cycle_time_hours !== null && previous.avg_cycle_time_hours !== null
+        ? Math.round((current.avg_cycle_time_hours - previous.avg_cycle_time_hours) * 10) / 10
+        : null,
+    staleDelta: current.stale_pr_count - previous.stale_pr_count,
+    scoreDelta: computeHealthScore(current) - computeHealthScore(previous),
+  }
+}
+
+export function trendArrow(delta: number | null, lowerIsBetter = false): string {
+  if (delta === null || delta === 0) return ''
+  return (delta > 0) !== lowerIsBetter ? ' ↑' : ' ↓'
+}
+
+export function trendColor(delta: number | null, lowerIsBetter = false): string {
+  if (delta === null || delta === 0) return 'var(--tm)'
+  const good = lowerIsBetter ? delta < 0 : delta > 0
+  return good ? '#3daa80' : '#c05060'
 }
 
 export function formatDigestPeriod(start: string | null, end: string | null): string {

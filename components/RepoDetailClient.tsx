@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import type { Repo, Digest } from '@/types'
 import ReportCard from './ReportCard'
-import { formatHours } from '@/lib/utils'
+import { formatHours, computeHealthScore, healthScoreColor, computeTrend, trendArrow, trendColor } from '@/lib/utils'
 
 interface Props {
   repo: Repo
@@ -24,6 +24,8 @@ export default function RepoDetailClient({ repo, initialDigests }: Props) {
     return Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10
   })()
   const totalCIFails = digests.reduce((s, d) => s + d.failed_job_names.length, 0)
+  const latestHealth = digests[0] ? computeHealthScore(digests[0]) : null
+  const trend = digests[0] ? computeTrend(digests[0], digests[1] ?? null) : null
 
   async function generateReport() {
     setGenerating(true)
@@ -60,17 +62,14 @@ export default function RepoDetailClient({ repo, initialDigests }: Props) {
             ← Dashboard
           </Link>
           <span style={{ color: 'var(--border-hi)' }}>|</span>
-          <span
-            style={{
-              fontWeight: 500,
-              fontSize: 13,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <span style={{ fontWeight: 500, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {repo.full_name}
           </span>
+          {latestHealth !== null && (
+            <span style={{ fontSize: 11, fontWeight: 700, color: healthScoreColor(latestHealth), letterSpacing: '0.06em', flexShrink: 0 }}>
+              {latestHealth}
+            </span>
+          )}
         </div>
         <button
           className="glass-btn glass-btn-primary"
@@ -92,18 +91,25 @@ export default function RepoDetailClient({ repo, initialDigests }: Props) {
         }}
       >
         {[
-          { label: 'Total Merged',   value: totalMerged,             color: totalMerged > 0 ? 'var(--merged)' : 'var(--tm)' },
-          { label: 'Currently Open', value: totalOpen,               color: 'var(--tm)' },
-          { label: 'Avg Cycle Time', value: formatHours(avgCycleAll), color: 'var(--tp)' },
-          { label: 'CI Failures',    value: totalCIFails,            color: totalCIFails > 0 ? 'var(--failed)' : 'var(--tm)' },
+          { label: 'Total Merged',   value: totalMerged,              color: totalMerged > 0 ? 'var(--merged)' : 'var(--tm)', delta: trend?.mergedDelta ?? null, lowerIsBetter: false },
+          { label: 'Currently Open', value: totalOpen,                color: 'var(--tm)',                                      delta: null,                         lowerIsBetter: true  },
+          { label: 'Avg Cycle Time', value: formatHours(avgCycleAll), color: 'var(--tp)',                                      delta: trend?.cycleDelta ?? null,    lowerIsBetter: true  },
+          { label: 'CI Failures',    value: totalCIFails,             color: totalCIFails > 0 ? 'var(--failed)' : 'var(--tm)', delta: null,                         lowerIsBetter: true  },
         ].map((s, i) => (
           <div
             key={s.label}
             className="stat-card"
             style={{ borderRight: i < 3 ? '1px solid var(--b1)' : 'none', textAlign: 'center' }}
           >
-            <div style={{ fontSize: 26, fontWeight: 300, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: 9, color: 'var(--tm)', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 2 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 4 }}>
+              <span style={{ fontSize: 26, fontWeight: 300, color: s.color }}>{s.value}</span>
+              {s.delta !== null && s.delta !== 0 && (
+                <span style={{ fontSize: 11, color: trendColor(s.delta, s.lowerIsBetter) }}>
+                  {trendArrow(s.delta, s.lowerIsBetter)}
+                </span>
+              )}
+            </div>
+            <div style={{ fontSize: 9, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 2 }}>
               {s.label}
             </div>
           </div>
