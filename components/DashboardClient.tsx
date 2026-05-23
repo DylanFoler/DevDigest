@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import type { Repo, Digest } from '@/types'
 import ConnectRepoModal from './ConnectRepoModal'
+import ExploreRepoModal from './ExploreRepoModal'
 import { formatDate, formatHours, computeHealthScore, healthScoreColor, computeTrend, trendArrow, trendColor } from '@/lib/utils'
 
 interface Props {
@@ -16,6 +17,7 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
   const [repos, setRepos] = useState<Repo[]>(initialRepos)
   const [digests, setDigests] = useState<Digest[]>(initialDigests)
   const [showModal, setShowModal] = useState(false)
+  const [showExploreModal, setShowExploreModal] = useState(false)
   const [generatingFor, setGeneratingFor] = useState<string | null>(null)
   const [error, setError] = useState('')
 
@@ -64,9 +66,14 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
           <span style={{ color: 'var(--accent)', letterSpacing: '0.10em', textTransform: 'uppercase', fontSize: 12 }}>Dashboard</span>
           <span style={{ color: 'var(--tm)', fontSize: 12 }}>/ {githubLogin}</span>
         </div>
-        <button className="glass-btn glass-btn-primary" style={{ fontSize: 11 }} onClick={() => setShowModal(true)}>
-          + Connect Repo
-        </button>
+        <div className="flex gap-2">
+          <button className="glass-btn" style={{ fontSize: 11 }} onClick={() => setShowExploreModal(true)}>
+            Explore
+          </button>
+          <button className="glass-btn glass-btn-primary" style={{ fontSize: 11 }} onClick={() => setShowModal(true)}>
+            + Connect Repo
+          </button>
+        </div>
       </div>
 
       {/* Global stats */}
@@ -145,13 +152,17 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
                       )}
                       {health !== null && (
                         <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 5,
+                          background: 'rgba(255,255,255,0.04)',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          borderRadius: 2,
+                          padding: '1px 7px',
                           fontSize: 10,
-                          fontWeight: 700,
-                          color: healthScoreColor(health),
-                          letterSpacing: '0.08em',
-                          opacity: 0.9,
                         }}>
-                          {health}
+                          <span style={{ color: 'var(--tm)', letterSpacing: '0.10em', textTransform: 'uppercase' }}>Repo Health Score</span>
+                          <span style={{ fontWeight: 700, color: healthScoreColor(health), letterSpacing: '0.04em' }}>{health}</span>
                         </span>
                       )}
                     </div>
@@ -257,6 +268,17 @@ export default function DashboardClient({ initialRepos, initialDigests, githubLo
           onConnected={(repo) => {
             handleConnected(repo)
             setShowModal(false)
+          }}
+          connectedIds={repos.map((r) => r.github_repo_id)}
+        />
+      )}
+
+      {showExploreModal && (
+        <ExploreRepoModal
+          onClose={() => setShowExploreModal(false)}
+          onReported={(repo, digest) => {
+            handleConnected(repo)
+            setDigests((prev) => [digest, ...prev])
           }}
           connectedIds={repos.map((r) => r.github_repo_id)}
         />

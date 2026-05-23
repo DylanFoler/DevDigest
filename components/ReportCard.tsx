@@ -27,8 +27,8 @@ export default function ReportCard({ digest, repo, onDelete }: Props) {
     if (!confirm('Delete this digest?')) return
     setDeleting(true)
     try {
-      await fetch(`/api/digests/${digest.id}`, { method: 'DELETE' })
-      onDelete(digest.id)
+      const res = await fetch(`/api/digests/${digest.id}`, { method: 'DELETE' })
+      if (res.ok) onDelete(digest.id)
     } finally {
       setDeleting(false)
     }
