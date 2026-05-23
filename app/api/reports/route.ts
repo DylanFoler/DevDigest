@@ -43,12 +43,20 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  let repo_id: string
+  let repo_id: string | undefined
+  let ownerParam: string | undefined
+  let repoParam: string | undefined
   try {
     const body = await req.json()
     repo_id = body.repo_id
+    ownerParam = body.owner
+    repoParam = body.repo
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+
+  if (!repo_id && !(ownerParam && repoParam)) {
+    return NextResponse.json({ error: 'repo_id or owner+repo required' }, { status: 400 })
   }
 
   try {
@@ -56,16 +64,39 @@ export async function POST(req: Request) {
   if (!userId) return NextResponse.json({ error: 'User not found' }, { status: 404 })
   const user = { id: userId }
 
-  const { data: repo } = await supabaseAdmin
-    .from('repos')
-    .select('*')
-    .eq('id', repo_id)
-    .eq('user_id', user.id)
-    .single()
+  const octokit = new Octokit({ auth: session.accessToken })
+
+  let repo: { id: string; owner: string; name: string; full_name: string } | null = null
+
+  if (repo_id) {
+    const { data } = await supabaseAdmin
+      .from('repos')
+      .select('*')
+      .eq('id', repo_id)
+      .eq('user_id', user.id)
+      .single()
+    repo = data
+  } else {
+    // Auto-connect an external public repo by owner/name
+    const { data: ghRepo } = await octokit.repos.get({ owner: ownerParam!, repo: repoParam! })
+    const { data: upserted } = await supabaseAdmin
+      .from('repos')
+      .upsert(
+        {
+          user_id: user.id,
+          github_repo_id: String(ghRepo.id),
+          owner: ghRepo.owner.login,
+          name: ghRepo.name,
+          full_name: ghRepo.full_name,
+        },
+        { onConflict: 'github_repo_id,user_id' }
+      )
+      .select()
+      .single()
+    repo = upserted
+  }
 
   if (!repo) return NextResponse.json({ error: 'Repo not found' }, { status: 404 })
-
-  const octokit = new Octokit({ auth: session.accessToken })
 
   // Fetch PRs
   const { data: rawPRs } = await octokit.pulls.list({
@@ -183,7 +214,7 @@ export async function POST(req: Request) {
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ digest })
+  return NextResponse.json({ digest, repo })
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : 'Report generation failed'
     console.error('report generation error:', e)

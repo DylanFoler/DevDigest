@@ -66,8 +66,19 @@ export default function RepoDetailClient({ repo, initialDigests }: Props) {
             {repo.full_name}
           </span>
           {latestHealth !== null && (
-            <span style={{ fontSize: 11, fontWeight: 700, color: healthScoreColor(latestHealth), letterSpacing: '0.06em', flexShrink: 0 }}>
-              {latestHealth}
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 2,
+              padding: '1px 7px',
+              fontSize: 10,
+              flexShrink: 0,
+            }}>
+              <span style={{ color: 'var(--tm)', letterSpacing: '0.10em', textTransform: 'uppercase' }}>Repo Health Score</span>
+              <span style={{ fontWeight: 700, color: healthScoreColor(latestHealth), letterSpacing: '0.04em' }}>{latestHealth}</span>
             </span>
           )}
         </div>

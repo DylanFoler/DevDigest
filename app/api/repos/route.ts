@@ -31,11 +31,15 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { github_repo_id, owner, name, full_name } = body
 
+  if (!github_repo_id || !owner || !name || !full_name) {
+    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  }
+
   const { data: repo, error } = await supabaseAdmin
     .from('repos')
     .upsert(
       { user_id: userId, github_repo_id: String(github_repo_id), owner, name, full_name },
-      { onConflict: 'github_repo_id' }
+      { onConflict: 'github_repo_id,user_id' }
     )
     .select()
     .single()
